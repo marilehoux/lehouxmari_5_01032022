@@ -1,48 +1,48 @@
-fillSection();
+fetch("http://localhost:3000/api/products")
+// appelle le serveur et demande la liste des produits
 
-// Récupération des articles de l'API
-async function getArticles() {
-    var articlesCatch = await fetch("http://localhost:3000/api/products")
-    return await articlesCatch.json();
+.then(function(res) {
+	if (res.ok) {
+	console.log(res.json);
+	return res.json();      
+}
+})
+
+// récupère l'input précédent
+.then(function(value) {
+	console.log(value);
+	afficherProduit(value);
+})
+.catch(function(err) {
+	alert('il n\'est pas possible d\'afficher les produits')
+});
+/**
+ * boucle sur tableau produit pour affichage des produits
+ * @param {array} tableauProduit  liste des produits
+ */
+function afficherProduit (tableauProduit){
+	let sectionProduit = document.getElementById('items');
+	tableauProduit.forEach(function(unProduit){
+		//ici création des balises dans "document"
+		let lien = document.createElement("a");
+		let article = document.createElement("article");
+		let image = document.createElement("img");
+		let productName = document.createElement("h3");
+		let productDescription = document.createElement("p");
+		// on a construit les balises, on écrit maintenant leurs propriétés
+		lien.href = './product.html?id='+ unProduit._id;   
+		image.src = unProduit.imageUrl;
+		image.alt = unProduit.altTxt;
+		productName.innerHTML =  unProduit.name;
+		productName.classList.add("productName");
+		productDescription.innerHTML = unProduit.description;
+		productDescription.classList.add("productDescription");
+		// on crée les éléments et les imbrications des éléments en commencant par le plus profond et en remontant
+		article.appendChild(image);
+		article.appendChild(productName);
+		article.appendChild(productDescription);
+		lien.appendChild(article);
+		sectionProduit.appendChild(lien);
+	});
 }
 
-    // Répartition des données de l'API dans le DOM
-async function fillSection() {
-    var result = await getArticles ()
-    .then(function (resultatAPI){
-        const articles = resultatAPI;
-        console.table(articles);
-        for (let article in articles) {
-
-            // Insertion de l'élément "a"
-            let productLink = document.createElement("a");
-            document.querySelector(".items").appendChild(productLink);
-            productLink.href = `product.html?id=${resultatAPI[article]._id}`;
-
-            // Insertion de l'élément "article"
-            let productArticle = document.createElement("article");
-            productLink.appendChild(productArticle);
-
-            // Insertion de l'image
-            let productImg = document.createElement("img");
-            productArticle.appendChild(productImg);
-            productImg.src = resultatAPI[article].imageUrl;
-            productImg.alt = resultatAPI[article].altTxt;
-
-            // Insertion du titre "h3"
-            let productName = document.createElement("h3");
-            productArticle.appendChild(productName);
-            productName.classList.add("productName");
-            productName.innerHTML = resultatAPI[article].name;
-
-            // Insertion de la description "p"
-            let productDescription = document.createElement("p");
-            productArticle.appendChild(productDescription);
-            productDescription.classList.add("productName");
-            productDescription.innerHTML = resultatAPI[article].description;
-        }
-    })
-    .catch (function(error){
-        return error;
-    });
-}
